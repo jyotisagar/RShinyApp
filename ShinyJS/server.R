@@ -2,7 +2,7 @@ library(shiny)
 shinyServer(
   function(input,output){
     delay(5000,hide('t')) # this will hide the text after given delay period in ms
-    
+    browser()
     observeEvent(input$alert,
                  alert('This is an alert message.Thank you')
                  )

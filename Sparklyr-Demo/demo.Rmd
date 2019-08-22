@@ -1,0 +1,31 @@
+library('deplyr')
+library('sparklyr')
+spark_install(version = '2.1.0')
+
+# create a spark session - we will use a custom conf for the 'sparklyr' connection
+# 16GB memory for the driver
+# Make 88% of memory accessible to use during the analysis
+
+conf <- spark_config()
+conf$'sparklyr.shell.driver-memory' <- '16G'
+conf$spark.memory.fraction <- 0.8
+
+sc <- spark_connect(master = 'local', config = conf, version = '2.1.0')
+
+# Navigate to http://127.0.0.1:4040/executers
+
+# this routine will retrieve the column names
+top_rows <- read.csv('mnist_train.csv',nrows = 5)
+file_column <- top_rows %>%
+  purrr::map(function(x)"character")
+rm(top_rows)
+
+sp_flight <- spark_read_csv(sc,
+                            name = 'flights',
+                            path = 'mnist_train',
+                            memory = FALSE,
+                            columns = file_column,
+                            infer_schema = FALSE
+                           )
+
+object.size(sp_flight)
